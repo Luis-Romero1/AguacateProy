@@ -1,9 +1,4 @@
-# Proyecto Bedu: Fase 2
-
-Somos el equipo 16 y nuestro tema es "Disponibilidad media de agua por Región hidrológica en México".
-
-El código, contiene anotaciones para conocer el procedimiento y objetivos que se tienen. 
-En el Shiny Dashboard se presentan los resultados finales.
+# Proyecto BEDU: Fase 2 Módulo 3
 
 + Luis Donaldo Romero Tapia 
 + Katherine Arzate Serrano
@@ -12,47 +7,143 @@ En el Shiny Dashboard se presentan los resultados finales.
 
 ---
 
-Video Resumen: https://youtu.be/jFIFGc1zS8U
+Video Resumen: [Oro Verde. El nuevo objetivo de los carteles](https://youtu.be/xwXkJ6bqixM)
 
 ---
 
-* Shiny: https://mnar99.shinyapps.io/proyectoCONAGUA/
+## 1. Identificación del problema
 
-**Nota:** Debido a que se hace uso de shapefiles, el servidor tarda unos segundos en cargar el mapa base.
+Actualmente México es uno de los principales exportadores de aguacate a nivel mundial. Dentro de la República Mexicana, Michoacán es el estado que más aguacates produce, 
+al ser de excelente calidad se destina la mayor parte a la exportación, su producción representa más del 74% de la cosecha nacional.
+Lo que muchos no saben es que la industria multimillonaria del aguacate en Michoacán se ha convertido en un objetivo para los cárteles organizados, sacando provecho de las 
+ganancias de los beneficios de este producto, lo que ha ocasionado que los índices de violencia aumenten. Los criminales buscan apropiarse del control del comercio de aguacate.
+
+“La corrupción y la impunidad son los peores enemigos de los agricultores porque en México quedan impunes los crímenes y no tienen la protección de quien debían tenerla”, 
+insistió un agricultor que ha sido afectado por esta situación.
+
+## 2. Preguntas clave
+
+En este contexto, hay varias cuestiones que resultaría interesante conocer de esta relación, tales como:
+
+* ¿Existirá alguna relación positiva o negativa entre la producción y la delincuencia/violencia?
+* Si existe una relación, ¿qué tan fuerte?
+* ¿A partir de qué momento se puede estimar con los datos el comienzo de esta relación?
+* ¿En qué municipios se puede observar mayor afectación por este suceso?
+* ¿Qué delito ha presentado un comportamiento que pudiera asociarse con la producción? 
+* ¿Cómo será el contexto en los siguientes años a partir de la situación observada?
+* ¿Habrá otros estados que pudieran verse envueltos en situaciones similares?
+
+## 3. Datos
+
+### 3.1 Estadística de Producción Agrícola de 1980 a 2019
+
+El Servicio de Información Agroalimentaria y Pesquera (SIAP), proporciona resúmenes anuales de la producción agrícola por cultivo por entidad y municipio (esta categoría 
+únicamente está presente desde el año 2003), la información se presenta en archivos `.csv` descargables desde la extensión de [Datos Abiertos](http://infosiap.siap.gob.mx/gobmx/datosAbiertos.php).
+
+### 3.2 Producción mensual de aguacate de 2018 a 2020
+
+[`Notebook`](notebooks/siap_asc_selenium.ipynb)
+
+La única fuente que cuenta con información de la producción mensual es el sitio de la SIAP > Producción mensual y agrícola > [Avance de Siembras y Cosechas](https://nube.siap.gob.mx/avance_agricola/).
+Esta información es la producción mensual acumulada en toneladas por entidad federativa y municipio del mes de enero de 2018 hasta el mes de enero de 2021. 
+
+![](figures/siap_exmp.jpg)
+
+El problema con este sitio es que no existe ninguna API visible o accesible, o forma de hacer un `GET` tradicional para obtener la información, pues el sitio 
+genera las consultas con JavaScript, y debido a la cantidad de consultas que requeríamos, hacer este trabajo de manera manual no era una opción viable. 
+
+De esta manera se optó por hacer uso de la API Selenium Python, la cual nos permitió rellenar los campos del formulario iterando sobre los años y meses para
+poder extraer y juntar el código HTML de las tablas generadas. El resultado se guardó para su procesamiento final. 
+
+![](figures/selenium.gif)
+
+### 3.3 Exportaciones mensuales de aguacate de 2003 a 2020
+
+[`Código`](src/siavi.py)
+
+El Sistema de Información Arancelaria Vía Internet (SIAVI) permite obtener información en valor y volumen de las importaciones y exportaciones de México a nivel fracción de 
+forma anual o mensual. Su objetivo es dar referencia sobre el comportamiento de las operaciones de comercio exterior y los antecedentes de la(s) fracción(es) desde su creación.
+
+La forma en que se obtuvo la información mensual de esta fuente fue con el uso de requests que facilitaron la consulta de las exportaciones mensuales del aguacate, con base
+en la fracción 0804.40.01 para el aguacate.
+
+![](figures/siavi_consulta.jpeg)
+
+### 3.4 Reportes de incidencia delictiva
+
+El gobierno de México provee información relacionada con la [incidencia delictiva](https://www.gob.mx/sesnsp/acciones-y-programas/datos-abiertos-de-incidencia-delictiva?state=published) a nivel nacional, donde hay información de 1997 al 2017 con la metodología antigua, y del 2015 
+al 2020 con la metodología nueva, para este análisis se tomó en cuenta la base de datos echa con la metodología nueva. 
+
+La base de datos contiene información detallada por año, entidad, municipio, el bien jurídico afectado, tipo de delito y modalidad de este, donde tiene un conteo de los delitos 
+por mes.
+
+Esta base nos será de utilidad ya que la utilizaremos como un referente de los delitos cometidos por grupos de narcotráfico, de esta manera podremos medir la relación existente 
+entre la producción de aguacate y el narcotráfico.
+
+![](figures/narcoco.PNG)
+
+## 4. Análisis exploratorio - Resultados principales
+
+### 4.1 Producción Nacional 2003-2019
+
+[`Notebook`](notebooks/analisisEstados.ipynb)
+
+Gracias a los datos que se limpiaron y almacenaron en 'dfMunicipios0319.csv', podemos hacer un análisis a nivel nacional por entidad.
+
+* Michoacán ha liderado la producción de aguacate en todo este periodo con un margen muy amplio respecto a los otros estados.
+* Durante el año 2019:
+  - De la producción nacional, más del 70% proviene de Michoacán.
+  - Michoacán tuvo la mayor siembra, cosecha, volumen de producción y valor por producción.
+  - San Luis Potosí presentó la mayor cantidad de cultivo siniestrado (dañado).
+  - Jalisco se destacó por tener el mejor rendimiento.
+  - Oaxaca presentó el mayor precio por el cultivo.
+
+![](figures/prod19_entidades.jpg)
+
+### 4.2 Delitos
+
+[`Notebook`](notebooks/Proyecto_final_aguacates1.0.ipynb)
+
+Teniendo las bases limpias, se busca limpiar la base de datos de delitos, la cual se filtrará para el estado de Michoacán, solo los municipios que reporten producción de 
+aguacate, y por los siguientes delitos que definimos como relacionados con el narcotráfico:
+
+* Homicidio 
+* Lesiones 
+* Secuestro 
+* Extorsión 
+* Narcomenudeo 
+* Amenazas 
+* Trata de personas 
+* Rapto 
+* Robo
+
+Se agrupo por tipo de delito, ya que existen muchas modalidades para cada uno de los mismos. Una vez limpia la base de datos se obtuvieron las correlaciones por municipio entre 
+la producción mensual y el número de reportes mensuales por tipo de delito.
+
+![](figures/narco_1.PNG)
+
+De los resultados podemos observar algunos ejemplos de mucha correlación como el municipio de Tzintzuntzan con el delito de amenaza; en Pátzcuaro con narcomenudeo (0.4), 
+observando que cuando hay alzas en estos delitos también lo hay en la producción de aguacate.
+
+![](figures/narco_2.PNG)
+
+Por otra parte, el que tengan correlación negativa podría significar que cuando no existe el delito está en alza la producción de aguacates, mientras que cuando existe el delito 
+baja la producción de aguacates. Esto hace pensar que quizá cuando no hay producción de aguacates los narcotraficantes se dedican a realizar otros actos delictivos que les 
+generen remuneración.
+
+![](figures/narco_3.PNG)
+
+De todo esto se concluye que existe una relación significativa a nivel estado, donde los delitos más relacionados son las amenazas, narcomenudeo, lesiones y homicidio, ¿esto cambiara algún día?
+
+![](figures/Narco_4.PNG)
+![](figures/narco_5.PNG)
 
 ---
-## 1.- Introducción
-CONAGUA se encarga de llevar un registro del consumo y descargas del agua por cuenca, pero lamentablemente la información expuesta presenta grandes problemas para su análisis, ya que cuenta acceso limitado, conceptos confusos y en las regiones no ofrecen el mismo periodo de tiempo en los datos por cada cuenca que forma parte de ella.
 
-Dado estos problemas, se tomó la decisión de completar los años o meses en blanco con el resultado del último registro con el que contaba para que en la gráfica final no presentara caídas por región hidrológica.
+## Recursos
 
-Cuando se habla de cuerpos de agua se utiliza la unidad de medida hectómetros cúbicos para calcular más fácilmente  capacidades de espacios, el agua localizada en las cuencas se concesionan y se debe respetar para no ponerlas en riesgo, si se excede, la cuenca entra a estado de déficit y la disponibilidad del agua será negativa porque la extracción del agua está siendo mayor que la cantidad de agua recopilada durante el proceso de escurrimiento, la precipitación se mide por milímetros, donde 1 mm de agua caída por lluvia equivale a 1 litro de E(agua) en un metro cuadrado.
-
-## 2.- Aplicación de series de tiempo por municipio de México
-Uno de los factores que debemos tener en cuenta para predecir el vmae es la precipitación, se puede calcular con la siguiente formula, propuesta por la NOM... 
-(es vmae=p * a * ce), así CONAGUA proporciona un histórico de 2000 a 2018 (mensuales y anuales) de precipitaciones, las cuales se emplearon para entrenar series de tiempo que nos ayudaran a estimar la precipitación anual del 2019 al 2023.
-
-Con ayuda del bucle “for” se calculó las series de tiempo de cada uno de los municipios de la Republica, el cual tomó más de 4 horas en ejecutarse para conseguir las precipitaciones por municipios del   2000 al 2023. Para calcular las precipitaciones por región hidrológica se mide con series de tiempo y los picos observados son casos aislados, todo en meses muy específicos.
-
-
-## 3.- Breve explicación del codigo 
-Después de haber calculado las precipitaciones de unierón a cada cuenca y  RHA su respectiva RH y precipitación anual (la cual se calcula con la media de los municipios asociados a la misma ), despues se procede a calcular un coeficiente k que es el producto del area por precipitación para posteriormente poder calcular el coeficiente c que emula a un coeficiente llamado ce que es igual a vmae(volumen medio anual de escuriimiento) / k , para obtener valores del 2021 al 2023 se utilizo medias moviles para c y k , mientras que para vaeas(volumen anual extracción de aguas superficiales) decidimos dejarlo constante ya que no cambia muy frecuentemente y por ultimo para vmae es igual a k*c de los ya estimados
-
-## 4.-Modelo de regresión para la predicción de la disponibilidad media de agua anual 
-Teniendo las predicciones para el volumen anual de extracción de agua superficial(vaea), para el volumen anual de escurrimiento natural, y las importaciones y exportaciones (que fueron obtenidas por promedios móviles) pasamos a pensar en un modelo lineal con la siguiente forma:
-
-DMA (Disponibilidad media anual) =VMAE (Volumen medio anual de escurrimiento) +VAEAS (Volumen anual de extracción de aguas superficiales + importaciones y exportaciones+b0
-E (donde b0 va a capturar esa información a la que no tuvimos acceso y así predecir la disponibilidad futura, los datos de entrenamiento son los que tenemos de 2005 al 2020 y ya teniendo los modelos, podemos utilizar los coeficientes para predecir la disponibilidad de los años 2021 a 2023
-
-## 5.-Shiny 
-En el shiny que se desarrolló, observamos el país de México dividido por sus 37 regiones hidrológicas, estas regiones tienen un color dependiendo la cantidad de cuencas que tiene. para más detalles es necesario pulsar sobre una región hidrológica para obtener su nombre, la extensión territorial, el número de cuencas y las cuencas con disponibilidad al 2020, al seleccionar la región, aparece la serie de tiempo de precipitación y su pronóstico hasta 2023, la gráfica de disponibilidad, la disponibilidad media de los años 2005 a 2020 y también la disponibilidad estimada hasta 2023.
-
-Para ejemplificar lo mencionado seleccionamos la Región #2 que es Baja California Centro-Oeste, cuenta una extensión territorial de 44,314km ^2 y 16 cuencas, de las cuales todas estarán disponibles para el 2020. En la disponibilidad que presenta, observamos como ha bajado los últimos años y se estima que los próximos que vienen bajará aún más, por lo que se debe estar prevenidos. En la gráfica de precipitación podemos ver que los durante los años no tiene una relación tan linean, pero se estima que se mantenga el mismo nivel los próximos años.
-
-## 6.-Conclusión
-
-De este shiny podemos identificar algunas cosas clave, como lo son las regiones hidrológicas que carecen de disponibilidad, como son sonora norte, bravo y conchos y Lerma de Santiago y balsas al centro.
-
-Por otra parte, revisando las predicciones y tendencias de la disponibilidad media de agua por RH, se puede decir también que por cada 2 RH que se están recuperando en DMA hay otras 8 que están decayendo en DMA, significando que el agua que consumimos está en grave peligro.
-
-Y aunque en nosotros está en cuidar más el agua, también es necesario que CONAGUA realice concesiones de manera responsable. Si juntos cuidamos la salud de nuestros acuíferos, lo cual se traduce en fuente de vida y desarrollo del resto de los seres vivos, contribuyendo al bienestar general en todas las actividades esenciales de vida.
+* [Planeación agrícola Nacional 2017-2030. Aguacate Mexicano](https://www.gob.mx/cms/uploads/attachment/file/257067/Potencial-Aguacate.pdf)
+* [Estadistica de produccion agricola 1980-2019](http://infosiap.siap.gob.mx/gobmx/datosAbiertos.php)
+* [Exportaciones mensuales 2003-2020](http://www.economia-snci.gob.mx/)
+* [Producción agrícola mensual 2018-2021](https://nube.siap.gob.mx/avance_agricola/)
+* [Incidencia delictiva 2015-2020](https://www.gob.mx/sesnsp/acciones-y-programas/datos-abiertos-de-incidencia-delictiva?state=published)
