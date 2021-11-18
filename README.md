@@ -42,12 +42,12 @@ El Servicio de Información Agroalimentaria y Pesquera (SIAP), proporciona resú
 
 ### 3.2 Producción mensual de aguacate de 2018 a 2020
 
-[`Notebook`](notebooks/siap_asc_selenium.ipynb)
+[`Notebook`](narco_aguacate-main/notebooks/siap_asc_selenium.ipynb)
 
 La única fuente que cuenta con información de la producción mensual es el sitio de la SIAP > Producción mensual y agrícola > [Avance de Siembras y Cosechas](https://nube.siap.gob.mx/avance_agricola/).
 Esta información es la producción mensual acumulada en toneladas por entidad federativa y municipio del mes de enero de 2018 hasta el mes de enero de 2021. 
 
-![](figures/siap_exmp.jpg)
+![](narco_aguacate-main/figures/siap_exmp.jpg)
 
 El problema con este sitio es que no existe ninguna API visible o accesible, o forma de hacer un `GET` tradicional para obtener la información, pues el sitio 
 genera las consultas con JavaScript, y debido a la cantidad de consultas que requeríamos, hacer este trabajo de manera manual no era una opción viable. 
@@ -55,11 +55,11 @@ genera las consultas con JavaScript, y debido a la cantidad de consultas que req
 De esta manera se optó por hacer uso de la API Selenium Python, la cual nos permitió rellenar los campos del formulario iterando sobre los años y meses para
 poder extraer y juntar el código HTML de las tablas generadas. El resultado se guardó para su procesamiento final. 
 
-![](figures/selenium.gif)
+![](narco_aguacate-main/figures/selenium.gif)
 
 ### 3.3 Exportaciones mensuales de aguacate de 2003 a 2020
 
-[`Código`](src/siavi.py)
+[`Código`](narco_aguacate-main/src/siavi.py)
 
 El Sistema de Información Arancelaria Vía Internet (SIAVI) permite obtener información en valor y volumen de las importaciones y exportaciones de México a nivel fracción de 
 forma anual o mensual. Su objetivo es dar referencia sobre el comportamiento de las operaciones de comercio exterior y los antecedentes de la(s) fracción(es) desde su creación.
@@ -67,7 +67,7 @@ forma anual o mensual. Su objetivo es dar referencia sobre el comportamiento de 
 La forma en que se obtuvo la información mensual de esta fuente fue con el uso de requests que facilitaron la consulta de las exportaciones mensuales del aguacate, con base
 en la fracción 0804.40.01 para el aguacate.
 
-![](figures/siavi_consulta.jpeg)
+![](narco_aguacate-main/figures/siavi_consulta.jpeg)
 
 ### 3.4 Reportes de incidencia delictiva
 
@@ -80,13 +80,13 @@ por mes.
 Esta base nos será de utilidad ya que la utilizaremos como un referente de los delitos cometidos por grupos de narcotráfico, de esta manera podremos medir la relación existente 
 entre la producción de aguacate y el narcotráfico.
 
-![](figures/narcoco.PNG)
+![](narco_aguacate-main/figures/narcoco.PNG)
 
 ## 4. Análisis exploratorio - Resultados principales
 
 ### 4.1 Producción Nacional 2003-2019
 
-[`Notebook`](notebooks/analisisEstados.ipynb)
+[`Notebook`](narco_aguacate-main/notebooks/analisisEstados.ipynb)
 
 Gracias a los datos que se limpiaron y almacenaron en 'dfMunicipios0319.csv', podemos hacer un análisis a nivel nacional por entidad.
 
@@ -98,11 +98,11 @@ Gracias a los datos que se limpiaron y almacenaron en 'dfMunicipios0319.csv', po
   - Jalisco se destacó por tener el mejor rendimiento.
   - Oaxaca presentó el mayor precio por el cultivo.
 
-![](figures/prod19_entidades.jpg)
+![](narco_aguacate-main/figures/prod19_entidades.jpg)
 
 ### 4.2 Delitos
 
-[`Notebook`](notebooks/Proyecto_final_aguacates1.0.ipynb)
+[`Notebook`](narco_aguacate-main/notebooks/Proyecto_final_aguacates1.0.ipynb)
 
 Teniendo las bases limpias, se busca limpiar la base de datos de delitos, la cual se filtrará para el estado de Michoacán, solo los municipios que reporten producción de 
 aguacate, y por los siguientes delitos que definimos como relacionados con el narcotráfico:
@@ -120,23 +120,23 @@ aguacate, y por los siguientes delitos que definimos como relacionados con el na
 Se agrupo por tipo de delito, ya que existen muchas modalidades para cada uno de los mismos. Una vez limpia la base de datos se obtuvieron las correlaciones por municipio entre 
 la producción mensual y el número de reportes mensuales por tipo de delito.
 
-![](figures/narco_1.PNG)
+![](narco_aguacate-main/figures/narco_1.PNG)
 
 De los resultados podemos observar algunos ejemplos de mucha correlación como el municipio de Tzintzuntzan con el delito de amenaza; en Pátzcuaro con narcomenudeo (0.4), 
 observando que cuando hay alzas en estos delitos también lo hay en la producción de aguacate.
 
-![](figures/narco_2.PNG)
+![](narco_aguacate-main/figures/narco_2.PNG)
 
 Por otra parte, el que tengan correlación negativa podría significar que cuando no existe el delito está en alza la producción de aguacates, mientras que cuando existe el delito 
 baja la producción de aguacates. Esto hace pensar que quizá cuando no hay producción de aguacates los narcotraficantes se dedican a realizar otros actos delictivos que les 
 generen remuneración.
 
-![](figures/narco_3.PNG)
+![](narco_aguacate-main/figures/narco_3.PNG)
 
 De todo esto se concluye que existe una relación significativa a nivel estado, donde los delitos más relacionados son las amenazas, narcomenudeo, lesiones y homicidio, ¿esto cambiara algún día?
 
-![](figures/Narco_4.PNG)
-![](figures/narco_5.PNG)
+![](narco_aguacate-main/figures/Narco_4.PNG)
+![](narco_aguacate-main/figures/narco_5.PNG)
 
 ---
 
